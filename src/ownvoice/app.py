@@ -15,6 +15,7 @@ from python_foundation.errors import BusinessError, ErrorCategory
 from python_foundation.web import RequestContextMiddleware, problem
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from ownvoice.api import router
 from ownvoice.config import Settings
 from ownvoice.domain import JobRequest, SegmentEdit, invalid
 from ownvoice.engine import runtime
@@ -49,7 +50,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         origin = request.headers.get("origin")
         if origin and origin != f"{request.url.scheme}://{request.headers.get('host')}":
             return reject("ORIGIN_DENIED", "다른 사이트에서의 요청은 허용하지 않습니다.")
-        if request.method not in ("GET", "HEAD", "OPTIONS") and request.headers.get("x-ownvoice") != "1":
+        # JSON-only v1 requests support ordinary API clients while rejecting
+        # cross-site form submissions. Origin validation above remains mandatory.
+        api_json = request.url.path.startswith("/v1/") and (
+            request.headers.get("content-type", "").split(";", 1)[0].strip().lower() == "application/json"
+        )
+        if (
+            request.method not in ("GET", "HEAD", "OPTIONS")
+            and request.headers.get("x-ownvoice") != "1"
+            and not api_json
+        ):
             return reject("REQUEST_DENIED", "OwnVoice 화면에서 요청해 주세요.")
         if urlsplit(str(request.url)).hostname not in ("localhost", "127.0.0.1", "testserver"):
             return reject("HOST_DENIED", "로컬 접속만 지원합니다.")
@@ -177,6 +187,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         if index < 0:
             raise invalid("잘못된 구간입니다.")
         return FileResponse(service.audio_path(key, index), media_type="audio/wav")
+
+    app.include_router(router(service))
 
     static = Path(__file__).parent / "static"
     app.mount("/static", StaticFiles(directory=static), name="static")

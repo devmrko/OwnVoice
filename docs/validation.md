@@ -187,3 +187,19 @@
   under .tools/python; a preinstalled system Python is not required.
 - Browser detail language switch preserves unsaved segment drafts; tested with
   mocked HTTP responses without mutating stored user jobs.
+
+## 0.2.0 Alpha 2 — local API
+
+- `ruff check`, `ruff format --check`, strict mypy: passed.
+- 42 tests passed: JSON/origin boundaries, unsupported options, model/voice discovery,
+  queued→completed SSE, reconnect snapshots, SRT review/failure events, WAV download,
+  edit/retry, synchronous speech and wait timeout preserving the queued job.
+- Apple M4/MPS, Qwen 0.6B: real `/v1/jobs` request delivered 20 progress snapshots,
+  one `segment_ready` and one `completed` in 20.05s; final WAV download succeeded.
+  `/v1/audio/speech` returned HTTP 200 and a valid 103,724-byte WAV. These are single
+  smoke-test observations, not performance guarantees. Private job IDs/audio remain
+  under ignored `.data`.
+- Source/wheel build and wheel asset/import verification passed. No new dependencies.
+- SSE sends snapshots and completed-segment URLs; incremental model audio streaming,
+  historical event replay, submission deduplication and remote authenticated hosting
+  are not implemented. Windows/CUDA inference was not exercised on this Mac.

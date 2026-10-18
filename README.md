@@ -2,9 +2,10 @@
 
 [English](README.en.md)
 
-현재 버전: **0.2.0a1 · 알파 1** ([릴리스](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.1))
+현재 버전: **0.2.0a2 · 알파 2** ([릴리스](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.2))
 
-내 목소리로 텍스트·SRT를 WAV로 만드는 로컬 웹 앱입니다.
+내 목소리로 텍스트·SRT를 WAV로 만드는 로컬 TTS 서비스입니다.
+웹 화면과 HTTP API로 사용할 수 있습니다.
 Qwen3-TTS·Chatterbox 모델 선택, CUDA/Apple Silicon 자동 선택, 구간 재생성,
 SRT 시간 맞춤과 실제 처리 기록에 기반한 진행 상황을 제공합니다.
 
@@ -171,6 +172,7 @@ uv run --locked python scripts/verify_wheel.py
 
 테스트는 임시 데이터와 테스트용 합성기를 사용합니다. 실행 중인 사용자 작업을 변경하지 않습니다.
 - [데이터 저장 파일·백업·복구](docs/storage.md)
+- [로컬 TTS API · SSE · Python/Java 호출 예제](docs/api.md)
 - [아키텍처와 처리 흐름](docs/architecture.md)
 - [라이브러리 명세](docs/libraries.md) · [전체 잠금 버전](docs/dependencies-lock.md)
 - [Windows CUDA·첫 실행](docs/platforms.md)

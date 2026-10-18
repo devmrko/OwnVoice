@@ -1,8 +1,9 @@
 # OwnVoice
 
-Current version: **0.2.0a1 · Alpha 1** ([release](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.1)).
+Current version: **0.2.0a2 · Alpha 2** ([release](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.2)).
 
-Local voice cloning for text and SRT narration, powered by Qwen3-TTS.
+Local TTS service for text and SRT narration, with Qwen3-TTS and Chatterbox.
+Use the web interface or HTTP API with SSE progress notifications.
 Export a single WAV with subtitle timing. The interface supports English and Korean.
 
 ## Start without Python or uv
@@ -72,6 +73,7 @@ Windows CUDA inference still needs hardware validation.
 The detailed technical documents are currently in Korean:
 
 - [Storage, backup and recovery](docs/storage.md)
+- [Local TTS API, SSE, Python/Java examples](docs/api.md)
 - [Architecture](docs/architecture.md)
 - [Libraries](docs/libraries.md) and [locked versions](docs/dependencies-lock.md)
 - [Platform installation](docs/platforms.md)

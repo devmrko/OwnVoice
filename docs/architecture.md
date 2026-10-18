@@ -82,3 +82,14 @@ CUDA 감지 성공은 실제 합성 성공을 뜻하지 않습니다. Windows CP
 분산 worker, 동시 GPU 합성, 사용자별 fine-tuning, 원격 인증, 자동 DB 마이그레이션은 범위 밖입니다.
 
 [저장·복구](storage.md) · [라이브러리 명세](libraries.md) · [플랫폼별 실행](platforms.md)
+
+## Versioned local API
+
+`ownvoice.api` exposes `/v1/models`, `/v1/voices`, `/v1/audio/speech` and
+`/v1/jobs` with status, SSE, audio, retry and segment-edit routes. Both the existing
+web API and v1 call the same `Service` and persistent queue; only the existing worker
+performs inference. Speech requests asynchronously wait for that worker (up to 600s),
+while job creation returns 202 immediately. Database polling uses the thread pool,
+so an open speech/SSE connection does not block the ASGI event loop. SSE sends current
+snapshots, not a persisted event history. No additional dependencies are required.
+See [API contract and examples](api.md).

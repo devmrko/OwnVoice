@@ -78,7 +78,7 @@ CUDA 실행기의 torch 재선택은 이 목록과 달라질 수 있습니다. `
 | onnxruntime | 1.31.0 | PyPI |
 | opentelemetry-api | 1.45.1 | PyPI |
 | orjson | 3.13.0 | PyPI |
-| ownvoice | 0.2.0a1 | . |
+| ownvoice | 0.2.0a2 | . |
 | packaging | 26.3 | PyPI |
 | pandas | 3.0.6 | PyPI |
 | pathspec | 1.1.1 | PyPI |
