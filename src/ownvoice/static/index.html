@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OwnVoice · 음성 스튜디오</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <a class="brand" href="/" aria-label="OwnVoice 홈"
+        ><span class="brand-mark" aria-hidden="true">◖</span> OwnVoice</a
+      ><span class="app-name">음성 스튜디오</span
+      ><span class="workspace-label"
+        ><span class="dot"></span>로컬 작업공간</span
+      >
+    </header>
+    <aside class="app-sidebar">
+      <div class="nav-label">작업공간</div>
+      <nav>
+        <button class="active" data-tab="create">
+          <span class="nav-icon" aria-hidden="true">＋</span>음성 생성</button
+        ><button data-tab="voices">
+          <span class="nav-icon" aria-hidden="true">◎</span>목소리 관리</button
+        ><button data-tab="jobs">
+          <span class="nav-icon" aria-hidden="true">≡</span>작업 내역
+        </button>
+      </nav>
+      <div class="aside-bottom">
+        <span class="dot"></span> 실행 환경
+        <p id="runtime">실행 환경 확인 중…</p>
+      </div>
+    </aside>
+    <main class="page-content">
+      <div class="breadcrumb">OwnVoice <span>/</span> 스튜디오</div>
+      <div id="notice" role="status" hidden></div>
+      <section class="runtime-panel" aria-label="실행 장치">
+        <div class="runtime-device">
+          <span class="runtime-label">실행 장치</span
+          ><strong id="device-name">확인 중</strong
+          ><small id="device-memory"></small>
+        </div>
+        <div class="runtime-device">
+          <span class="runtime-label">처리 환경</span
+          ><strong id="device-backend">—</strong
+          ><small id="device-state"></small>
+        </div>
+        <div class="runtime-device">
+          <span class="runtime-label">음성 엔진</span
+          ><strong id="engine-name">확인 중</strong
+          ><small id="engine-version"></small>
+        </div>
+        <div class="runtime-device">
+          <span class="runtime-label">음성 모델</span
+          ><strong id="model-name">확인 중</strong
+          ><small>참조 음성 기반 복제</small>
+        </div>
+      </section>
+      <section id="create" class="tab">
+        <div class="page-heading">
+          <div>
+            <h1>음성 생성</h1>
+            <p>텍스트 또는 SRT를 WAV로 변환합니다.</p>
+          </div>
+          <span class="page-tag">TTS / WAV</span>
+        </div>
+        <form id="create-form" class="panel">
+          <div class="panel-title layout-between">
+            <h2>생성 설정</h2>
+            <span class="muted">출력 형식 · WAV</span>
+          </div>
+          <div class="form-grid">
+            <label class="form-field"
+              >목소리<select id="profile" required>
+                <option value="">등록된 목소리 없음</option>
+              </select></label
+            ><label class="form-field"
+              >언어<select id="language">
+                <option value="Korean">한국어</option>
+                <option value="English">영어</option>
+                <option value="Japanese">일본어</option>
+                <option value="Chinese">중국어</option>
+                <option value="Auto">자동</option>
+              </select></label
+            >
+          </div>
+          <div class="switch">
+            <button type="button" data-mode="text" class="active">
+              텍스트 TTS</button
+            ><button type="button" data-mode="srt">영상 자막 · SRT</button>
+          </div>
+          <label class="form-field" id="srt-upload" hidden
+            >SRT 파일 불러오기<input id="srt-file" type="file" accept=".srt"
+          /></label>
+          <div class="form-field">
+            <label for="content" id="content-label">텍스트</label
+            ><textarea
+              id="content"
+              required
+              maxlength="100000"
+              placeholder="합성할 텍스트 입력"
+            ></textarea>
+          </div>
+          <div class="form-footer layout-between">
+            <small id="mode-help">문장 사이 0.2초 간격 · 단일 WAV 출력</small
+            ><button class="primary" type="submit">생성 시작</button>
+          </div>
+        </form>
+        <div class="features">
+          <button type="button" data-tab="voices">
+            <span class="card-icon" aria-hidden="true">◎</span>
+            <div>
+              <h3>목소리 관리</h3>
+              <p>녹음 · 음성 파일 등록</p>
+            </div>
+            <span class="card-arrow" aria-hidden="true">→</span></button
+          ><button type="button" data-tab="jobs">
+            <span class="card-icon" aria-hidden="true">≡</span>
+            <div>
+              <h3>작업 내역</h3>
+              <p>진행률 · 미리듣기 · 다운로드</p>
+            </div>
+            <span class="card-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+      <section id="voices" class="tab" hidden>
+        <div class="page-heading">
+          <div>
+            <h1>목소리 관리</h1>
+            <p>참조 음성 등록 · 3~60초</p>
+          </div>
+          <span class="page-tag">VOICE</span>
+        </div>
+        <form id="voice-form" class="panel">
+          <div class="panel-title layout-between">
+            <h2>목소리 등록</h2>
+            <span class="muted">녹음 또는 파일 업로드</span>
+          </div>
+          <label class="form-field"
+            >목소리 이름<input
+              id="voice-name"
+              maxlength="80"
+              placeholder="나의 기본 목소리"
+              required
+          /></label>
+          <div class="record-row layout-inline">
+            <button id="record" type="button">● 녹음 시작</button
+            ><span id="record-status">최대 60초</span>
+          </div>
+          <label class="form-field"
+            >참조 음성<input
+              id="voice-file"
+              type="file"
+              accept="audio/*" /></label
+          ><audio id="record-preview" controls hidden></audio
+          ><label class="form-field"
+            >참조 대본<textarea
+              id="transcript"
+              maxlength="3000"
+              placeholder="참조 음성의 대본 입력 (선택)"
+            ></textarea>
+          </label>
+          <div class="form-footer layout-between">
+            <small>참조 음성 · 3~60초</small
+            ><button class="primary" type="submit">목소리 등록</button>
+          </div>
+        </form>
+        <div id="voice-list" class="record-list"></div>
+      </section>
+      <section id="jobs" class="tab" hidden>
+        <div class="page-heading">
+          <div>
+            <h1>작업 내역</h1>
+            <p>진행률 확인 · 구간 편집 · WAV 다운로드</p>
+          </div>
+          <span class="page-tag">JOBS</span>
+        </div>
+        <div id="job-list" class="record-list"></div>
+        <div id="detail" class="panel" hidden></div>
+      </section>
+      <footer class="page-footer">OwnVoice <span>음성 스튜디오</span></footer>
+    </main>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

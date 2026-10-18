@@ -1,0 +1,50 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ownvoice"
+version = "0.1.0"
+description = "Your voice for narration and TTS"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.12,<3.14"
+dependencies = ["devmrko-python-foundation", "numpy>=2,<3", "soundfile>=0.13,<1", "filelock>=3.18,<4"]
+
+[project.optional-dependencies]
+tts = ["qwen-tts==0.1.1"]
+
+[project.scripts]
+ownvoice = "ownvoice.cli:main"
+
+[dependency-groups]
+dev = ["httpx>=0.28,<1", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2"]
+
+[tool.uv.sources]
+devmrko-python-foundation = { path = "vendor/python-foundation" }
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/vendor", "/tests", "/scripts", "/docs", "/README.md", "/LICENSE", "/pyproject.toml", "/uv.lock"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ownvoice"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "B008"]
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src/ownvoice"]
+[[tool.mypy.overrides]]
+module = ["python_foundation.*"]
+follow_untyped_imports = true
+[[tool.mypy.overrides]]
+module = ["soundfile", "qwen_tts", "torch"]
+ignore_missing_imports = true
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
