@@ -7,6 +7,7 @@
   let mode = "text",
     selectedJob = null,
     detailVersion = null,
+    detailLocale = null,
     recording = null,
     recordedFile = null,
     recordTimer = null,
@@ -558,11 +559,13 @@
     )
       return;
     if (
+      detailLocale === OwnVoiceI18n.locale &&
       $("detail").contains(document.activeElement) &&
       document.activeElement.tagName === "TEXTAREA"
     )
       return;
     detailVersion = version;
+    detailLocale = OwnVoiceI18n.locale;
     const box = $("detail");
     box.dataset.jobId = j.id;
     box.hidden = false;
