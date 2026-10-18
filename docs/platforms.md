@@ -1,7 +1,6 @@
 # 설치·플랫폼 지원
 
 Git이 없어도 GitHub의 **Code → Download ZIP**으로 받아 압축을 풀면 됩니다.
-foundation은 포함되어 있으므로 다른 소스 저장소를 받을 필요가 없습니다.
 
 ## Python·uv가 없는 첫 실행
 

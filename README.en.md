@@ -5,8 +5,7 @@ Export a single WAV with subtitle timing. The interface supports English and Kor
 
 ## Start without Python or uv
 
-Download **Code → Download ZIP** and extract it. The foundation source is included;
-no private repository, GitHub credentials, or separate source checkout is needed.
+Download **Code → Download ZIP** and extract it.
 
 1. Install FFmpeg and ensure `ffmpeg` is on PATH.
 2. Windows: run `start.cmd`; for NVIDIA run `start.cmd -Cuda`.
@@ -53,5 +52,5 @@ The detailed technical documents are currently in Korean:
 - [Platform installation](docs/platforms.md)
 - [Validation](docs/validation.md)
 
-MIT license for OwnVoice and the bundled author-owned foundation. External packages
+OwnVoice uses the MIT license. External packages
 and Qwen model weights retain their respective licenses.

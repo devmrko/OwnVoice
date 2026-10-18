@@ -33,9 +33,6 @@ uv run --locked --extra tts ownvoice start
 브라우저: **http://127.0.0.1:8765**. 종료는 실행한 터미널에서 **Ctrl+C**입니다.
 `start`는 웹과 worker를 함께 실행하고 함께 종료합니다. 사용 중인 포트나 중복 worker는 거부합니다.
 
-**OwnVoice 저장소 하나만 받으면 됩니다.** Python foundation 소스는
-[`vendor/python-foundation`](vendor/python-foundation)에 포함되어 있습니다.
-참조 저장소를 따로 받거나 GitHub 인증을 설정할 필요가 없습니다.
 Python 패키지와 TTS 모델 다운로드에는 인터넷이 필요합니다.
 
 ## 모델 다운로드
@@ -154,5 +151,5 @@ uv run --locked python scripts/verify_wheel.py
 
 ## 라이선스
 
-OwnVoice와 함께 제공되는 작성자 소유 Python foundation은 [MIT](LICENSE) 라이선스입니다.
+OwnVoice는 [MIT](LICENSE) 라이선스입니다.
 Qwen 모델과 외부 패키지에는 각각의 라이선스가 적용됩니다.
