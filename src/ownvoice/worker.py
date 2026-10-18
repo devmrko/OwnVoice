@@ -50,38 +50,64 @@ def process_job(service: Service, engine: Engine, job: dict[str, Any]) -> None:
             for segment in job["segments"]:
                 job["current_segment"] = segment["index"] + 1
                 raw = folder / f"{segment['index']}.wav"
-                if not raw.exists() or segment["status"] == "pending":
-                    if not isinstance(engine, QwenEngine):
-                        stage("synthesizing")
-                    samples = engine.synthesize(
-                        segment["text"], reference, profile["transcript"], job["language"]
-                    )
-                    if synthesis_started is not None:
-                        job["synthesis_timings"].append(
-                            {
-                                "seconds": time.monotonic() - synthesis_started,
-                                "chars": len(segment["text"]),
-                                "audio_seconds": len(samples) / RATE,
-                            }
+                limit = service.settings.srt_max_attempts if job["mode"] == "srt" else 1
+                segment.setdefault("synthesis_attempts", 0)
+                segment["timing_error"] = None
+                job.update(current_attempt=segment["synthesis_attempts"], attempt_limit=limit)
+                regenerate = not raw.exists() or (
+                    segment["status"] == "pending" and segment["synthesis_attempts"] == 0
+                )
+                while True:
+                    if regenerate:
+                        segment["synthesis_attempts"] += 1
+                        job.update(current_attempt=segment["synthesis_attempts"], attempt_limit=limit)
+                        stage("initializing" if isinstance(engine, QwenEngine) else "synthesizing")
+                        samples = engine.synthesize(
+                            segment["text"], reference, profile["transcript"], job["language"]
                         )
-                    if job.get("first_audio_ready_seconds") is None:
-                        job["first_audio_ready_seconds"] = time.time() - job["started_at"]
-                    write_atomic(raw, samples)
-                stage("fitting")
-                samples, _ = sf.read(raw, dtype="float32")
-                segment["duration_ms"] = round(len(samples) * 1000 / RATE)
-                segment["speed"] = 1.0
-                if job["mode"] == "srt":
+                        if synthesis_started is not None:
+                            job["synthesis_timings"].append(
+                                {
+                                    "seconds": time.monotonic() - synthesis_started,
+                                    "chars": len(segment["text"]),
+                                    "audio_seconds": len(samples) / RATE,
+                                    "segment_index": segment["index"],
+                                }
+                            )
+                        if job.get("first_audio_ready_seconds") is None:
+                            job["first_audio_ready_seconds"] = time.time() - job["started_at"]
+                        # Keep the shortest whole candidate, never truncate speech.
+                        if not raw.exists() or len(samples) < sf.info(raw).frames:
+                            write_atomic(raw, samples)
+                    stage("fitting")
+                    samples, _ = sf.read(raw, dtype="float32")
+                    segment["duration_ms"] = round(len(samples) * 1000 / RATE)
+                    segment["speed"] = 1.0
+                    if job["mode"] != "srt":
+                        break
                     start = round(segment["start_ms"] * RATE / 1000)
                     end = round(segment["end_ms"] * RATE / 1000)
                     try:
                         samples, speed = fit_audio(raw, end - start, service.settings.max_speed)
                         segment["speed"] = speed
+                        break
                     except TimingOverflow:
+                        if segment["synthesis_attempts"] < limit:
+                            regenerate = True
+                            continue
+                        available = (end - start) / RATE
                         segment["status"] = "needs_review"
+                        segment["timing_error"] = (
+                            f"{segment['synthesis_attempts']}회 시도 · 배정 {available:.2f}초 · "
+                            f"최단 음성 {segment['duration_ms'] / 1000:.2f}초 · "
+                            f"최대 {service.settings.max_speed:.2f}배 가속으로 맞출 수 없습니다."
+                        )
                         review = True
                         service.update_job(key, job)
-                        continue
+                        break
+                if segment["timing_error"] is not None:
+                    continue
+                if job["mode"] == "srt":
                     # Write bounded silence chunks to keep long SRTs memory-safe.
                     gap = start - output.tell()
                     while gap > 0:
@@ -104,7 +130,9 @@ def process_job(service: Service, engine: Engine, job: dict[str, Any]) -> None:
         if review:
             staged.unlink(missing_ok=True)
             job["status"] = "needs_review"
-            job["error"] = "시간을 초과한 구간을 수정하거나 다시 생성해 주세요."
+            job["error"] = (
+                "자동 재시도 후에도 시간을 초과한 구간이 있습니다. 구간별 배정 시간과 음성 길이를 확인해 주세요."
+            )
         else:
             os.replace(staged, folder / "output.wav")
             job["status"] = "completed"

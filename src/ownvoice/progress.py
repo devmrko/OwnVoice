@@ -34,6 +34,8 @@ def job_progress(job: dict[str, Any], now: float | None = None) -> dict[str, Any
         "stage": job.get("stage", "legacy_running" if job["status"] == "running" else job["status"]),
         "stage_started_at": job.get("stage_started_at"),
         "performance": performance(job),
+        "current_attempt": job.get("current_attempt"),
+        "attempt_limit": job.get("attempt_limit"),
         "current_segment": job.get("current_segment"),
         "total": total,
         "done": done,

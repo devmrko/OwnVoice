@@ -121,3 +121,18 @@ concurrent recovery/claims on the same data. Interrupted segments are regenerate
 on restart; committed completed segments are reused. `doctor` checks dependency
 presence, device availability and FFmpeg. `download-model` downloads a complete
 Hugging Face snapshot without GPU allocation; `--offline` checks cached files.
+
+## Bounded SRT timing retries
+
+Every SRT cue uses the same timing retry policy, independent of source text or
+cue number. On TimingOverflow, synthesize the unchanged text again, up to
+OWNVOICE_SRT_MAX_ATTEMPTS (default 3 total attempts, range 1–5). Retain the
+shortest complete candidate. Fit at no more than the configured speed limit;
+do not truncate speech, edit text, move cues or borrow the next cue's time.
+Persist attempt counts before inference; resume uses saved candidates and
+remaining budget. A manual retry/edit resets the selected cue's budget.
+Completed cues are cached. Exhausted cues include measured duration, allotted
+time and attempt count; other cues continue and final export remains blocked.
+Timing samples include each inference attempt, including discarded candidates.
+This increases the chance of fitting; it does not guarantee fit or validate
+that the model pronounced every word. Preview remains necessary for quality.

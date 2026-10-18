@@ -18,6 +18,8 @@ class Segment(BaseModel):
     status: str = "pending"
     duration_ms: int | None = None
     speed: float = 1.0
+    synthesis_attempts: int = 0
+    timing_error: str | None = None
 
 
 class JobRequest(BaseModel):

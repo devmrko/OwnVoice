@@ -306,6 +306,9 @@ function paintProgress(panel, job) {
         `요청 후 ${duration(p.request_age_seconds === null ? null : p.request_age_seconds + (["running", "queued"].includes(job.status) ? advance : 0))}`,
       ),
     );
+  if (active && p.current_attempt > 1) {
+    metrics.append(el("span", `시간 맞춤 재시도 ${p.current_attempt}/${p.attempt_limit}회`));
+  }
   panel.append(metrics);
   const perf = p.performance;
   if (perf) {
@@ -448,6 +451,12 @@ function segmentView(job, segment) {
         "segment-meta",
       ),
     );
+  }
+  if (segment.synthesis_attempts > 1) {
+    section.append(el("p", `합성 ${segment.synthesis_attempts}회`, "segment-meta"));
+  }
+  if (segment.timing_error) {
+    section.append(el("p", segment.timing_error, "worker-warning"));
   }
   const input = el("textarea", undefined, "segment-text");
   input.setAttribute("aria-label", `${segment.index + 1}번 구간 텍스트`);

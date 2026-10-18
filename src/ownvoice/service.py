@@ -121,12 +121,21 @@ class Service:
             if index is not None:
                 if not 0 <= index < len(segments):
                     raise missing()
-                segments[index].update(text=text, status="pending", duration_ms=None, speed=1.0)
+                segments[index].update(
+                    text=text,
+                    status="pending",
+                    duration_ms=None,
+                    speed=1.0,
+                    synthesis_attempts=0,
+                    timing_error=None,
+                )
                 (self.settings.data_dir / "jobs" / key / f"{index}.wav").unlink(missing_ok=True)
             else:
                 for segment in segments:
                     if segment["status"] == "needs_review":
-                        segment["status"] = "pending"
+                        segment.update(
+                            status="pending", synthesis_attempts=0, timing_error=None, duration_ms=None
+                        )
                         (self.settings.data_dir / "jobs" / key / f"{segment['index']}.wav").unlink(
                             missing_ok=True
                         )
@@ -136,6 +145,8 @@ class Service:
                 started_at=None,
                 finished_at=None,
                 current_segment=None,
+                current_attempt=None,
+                attempt_limit=None,
                 synthesis_timings=[],
                 phase_seconds={},
                 first_audio_ready_seconds=None,

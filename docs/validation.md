@@ -92,3 +92,11 @@
   was not synchronized or replaced. New CLI behavior applies to new processes.
 - NVIDIA hardware and Windows have not been exercised locally. CI covers the
   model-free tests on Linux/macOS; it does not validate GPU inference or voice quality.
+
+## Automatic SRT timing retries
+
+- 28 tests passed: several cues needing different attempt counts, exact final
+  sample timeline after retries, bounded exhaustion, preservation of shortest
+  candidate, continuing later cues, manual retry reset and completed-cue reuse.
+- Retry tests use controlled audio durations; no user's completed audio is modified.
+- Existing lifecycle, audio fitting, API boundaries and progress tests remain passing.

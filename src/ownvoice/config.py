@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     model: str = "Qwen/Qwen3-TTS-12Hz-1.7B-Base"
     max_speed: float = Field(default=1.15, ge=1.0, le=1.15, allow_inf_nan=False)
 
+    srt_max_attempts: int = Field(default=3, ge=1, le=5)
+
     def prepare(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         for name in ("profiles", "jobs"):
