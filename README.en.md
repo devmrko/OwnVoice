@@ -24,6 +24,54 @@ Register 3–60 seconds of reference audio and its transcript, then enter text o
 load a UTF-8 SRT. Review generated segments and download the finished WAV.
 The interface language selector does not change speech language or user content.
 
+## Local TTS API
+
+Start the app normally. The API shares `http://127.0.0.1:8765` with the web UI.
+Register a voice in the UI and replace `VOICE_ID` with its ID from `/v1/voices`.
+API jobs also appear in the web job history.
+
+```sh
+curl http://127.0.0.1:8765/v1/voices
+curl http://127.0.0.1:8765/v1/models
+
+curl --fail-with-body http://127.0.0.1:8765/v1/audio/speech \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"qwen-small","voice":"VOICE_ID","input":"Hello.","language":"English","response_format":"wav"}' \
+  --output speech.wav
+```
+
+These examples use macOS/Linux shell syntax. On HTTP failure, the output file may
+contain an error response instead of audio. Choose `qwen`, `qwen-small` or `chatterbox`.
+Only WAV output is supported; this implements a subset of the OpenAI speech request format.
+
+For long scripts and SRT, submit a job and receive SSE progress:
+
+```sh
+# job.json contains model, voice, input, language and mode ("text" or "srt")
+curl --fail-with-body http://127.0.0.1:8765/v1/jobs \
+  -H 'Content-Type: application/json' --data-binary @job.json
+
+# Replace JOB_ID with the returned id
+curl -N http://127.0.0.1:8765/v1/jobs/JOB_ID/events
+curl --fail http://127.0.0.1:8765/v1/jobs/JOB_ID/audio --output narration.wav
+```
+
+| API | Purpose |
+|---|---|
+| `POST /v1/audio/speech` | Wait for synthesis and return WAV |
+| `POST /v1/jobs` | Submit text/SRT and immediately return a job ID |
+| `GET /v1/jobs/{id}` | Status, measured elapsed time and estimated remaining time |
+| `GET /v1/jobs/{id}/events` | SSE progress, segment readiness and completion |
+| `GET /v1/jobs/{id}/audio` | Download the completed WAV |
+
+SSE carries progress and completed-segment audio URLs, not incremental audio during
+synthesis. ETA remains null until enough measured samples exist. Speech requests wait
+up to 600 seconds; jobs continue after timeout or disconnect. Prefer `/v1/jobs` for
+long requests. This release is local-only and does not require an API key.
+
+[Full API contract, SRT input and Python/Java examples](docs/api.md) ·
+[Swagger UI on your running server](http://127.0.0.1:8765/docs)
+
 ## Data and timing
 
 History is in `.data/ownvoice.db`; references are in `.data/profiles/`; segment

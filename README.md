@@ -38,6 +38,56 @@ uv run --locked --extra tts ownvoice start
 
 Python 패키지와 TTS 모델 다운로드에는 인터넷이 필요합니다.
 
+## 로컬 TTS API
+
+앱을 실행하면 웹과 같은 주소 `http://127.0.0.1:8765`에서 API를 사용할 수 있습니다.
+웹에서 목소리를 등록한 뒤 `/v1/voices`가 반환하는 ID를 `VOICE_ID`에 넣으세요.
+API로 만든 작업도 웹의 작업 내역에 표시됩니다.
+
+```sh
+# 등록한 목소리와 사용 가능한 모델 조회
+curl http://127.0.0.1:8765/v1/voices
+curl http://127.0.0.1:8765/v1/models
+
+# 텍스트 합성 후 WAV 저장
+curl --fail-with-body http://127.0.0.1:8765/v1/audio/speech \
+  -H 'Content-Type: application/json' \
+  -d '{"model":"qwen-small","voice":"VOICE_ID","input":"안녕하세요.","language":"Korean","response_format":"wav"}' \
+  --output speech.wav
+```
+
+위 예제는 macOS·Linux 셸 기준입니다. HTTP 오류가 나면 출력 파일은 음성이 아닌
+오류 응답일 수 있습니다. 모델은 `qwen`, `qwen-small`, `chatterbox` 중 선택합니다.
+현재 WAV만 지원하며 OpenAI 음성 요청 형식의 일부를 지원합니다.
+
+긴 대본·SRT는 작업을 등록하고 SSE로 진행 상황을 받습니다.
+
+```sh
+# job.json: model, voice, input, language와 mode("text" 또는 "srt") 지정
+curl --fail-with-body http://127.0.0.1:8765/v1/jobs \
+  -H 'Content-Type: application/json' --data-binary @job.json
+
+# 응답의 id를 JOB_ID에 입력
+curl -N http://127.0.0.1:8765/v1/jobs/JOB_ID/events
+curl --fail http://127.0.0.1:8765/v1/jobs/JOB_ID/audio --output narration.wav
+```
+
+| API | 기능 |
+|---|---|
+| `POST /v1/audio/speech` | 합성 완료 후 WAV 반환 |
+| `POST /v1/jobs` | 텍스트·SRT 작업 등록, 즉시 작업 ID 반환 |
+| `GET /v1/jobs/{id}` | 상태·실측 시간·예상 남은 시간 조회 |
+| `GET /v1/jobs/{id}/events` | SSE 진행 상황·구간 준비·완료 알림 |
+| `GET /v1/jobs/{id}/audio` | 완성된 WAV 다운로드 |
+
+SSE는 진행 알림과 완성된 구간의 음성 URL을 전달합니다. 합성 도중 음성을 조금씩
+전송하는 기능은 아직 지원하지 않습니다. 예상 남은 시간은 실측 기록이 쌓인 뒤 표시합니다.
+일반 합성 요청은 최대 600초 대기하며, 시간 초과나 연결 종료 후에도 작업은 계속됩니다.
+오래 걸리는 요청은 `/v1/jobs`를 사용하세요. 현재는 인증 없는 로컬 전용 서비스입니다.
+
+[전체 API 명세·SRT 입력·Python/Java 예제](docs/api.md) ·
+[실행 중인 서버의 Swagger UI](http://127.0.0.1:8765/docs)
+
 ## 모델 다운로드
 
 기본 모델은 `Qwen/Qwen3-TTS-12Hz-1.7B-Base`입니다.
