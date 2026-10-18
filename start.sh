@@ -7,6 +7,6 @@ if ! command -v ffmpeg >/dev/null 2>&1; then
     exit 1
 fi
 # --setup-only prepares dependencies without starting the server or downloading models.
-"$ownvoice_root/uvw" sync --locked --extra tts --python 3.12
+"$ownvoice_root/uvw" sync --locked --no-dev --extra tts --python 3.12 --managed-python
 if [ "${1:-}" = '--setup-only' ]; then exit 0; fi
 exec "$ownvoice_root/uvw" run --no-sync ownvoice start "$@"

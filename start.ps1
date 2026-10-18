@@ -7,7 +7,7 @@ if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
     Write-Host 'Open a new terminal after installation, then run start.cmd again.'
     exit 1
 }
-& powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\uvw.ps1" sync --locked --extra tts --python 3.12
+& powershell -NoProfile -ExecutionPolicy Bypass -File "$PSScriptRoot\uvw.ps1" sync --locked --no-dev --extra tts --python 3.12 --managed-python
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 # PyPI Windows wheels can be CPU-only. Select a driver-compatible CUDA wheel explicitly.
 if ($Cuda) {

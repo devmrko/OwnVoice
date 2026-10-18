@@ -117,3 +117,10 @@
 - Windows CI added for model-free installation, tests and packaging. Actual NVIDIA
   inference, CUDA wheel selection and interactive Windows console shutdown need
   hardware validation; these are not claimed from CPU CI.
+
+- Windows, Linux and macOS CI all passed for the documentation/i18n/bootstrap
+  changes (32 application tests; one POSIX signal test skipped on Windows).
+- Full first-start installation passed with a project-managed Python 3.12.12
+  under .tools/python; a preinstalled system Python is not required.
+- Browser detail language switch preserves unsaved segment drafts; tested with
+  mocked HTTP responses without mutating stored user jobs.
