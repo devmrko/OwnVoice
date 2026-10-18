@@ -581,6 +581,25 @@ nav .active .nav-icon {
   background: #fbe8e3;
   color: #9b3d28;
 }
+.job-row.is-selected {
+  border-color: var(--accent);
+  background: #eef6f7;
+  box-shadow: inset 4px 0 var(--accent);
+}
+.job-row.is-selected > .job-header > button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.job-row > #detail {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  padding: var(--space-4) 0 0;
+  background: transparent;
+  box-shadow: none;
+}
 .empty {
   padding: 40px;
   color: var(--muted);

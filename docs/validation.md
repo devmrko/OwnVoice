@@ -1,5 +1,17 @@
 # Validation — 2026-10-18
 
+## 0.2.0a1: inline job details
+
+- Selected jobs expand their details inside the corresponding row. A teal
+  border/background and an expanded-state toggle distinguish the selection;
+  closing or selecting another row updates the highlight and ARIA state.
+- Job polling reconciles rows by ID instead of replacing the whole list. Chrome
+  confirmed the same audio element continues playing through polling and a
+  simulated new job insertion, with no pause events. Draft text survives polling
+  and switching away/back. Korean/English labels and 390px layout passed.
+- Package version and root lockfile updated to `0.2.0a1` for Git tag
+  `v0.2.0-alpha.1`. Tests: 36 passed; source/wheel builds and packaged assets passed.
+
 ## Model selection and real MPS comparison
 
 - Jobs persist an engine selection: Qwen 1.7B, Qwen 0.6B or Chatterbox Multilingual

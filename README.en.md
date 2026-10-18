@@ -1,5 +1,7 @@
 # OwnVoice
 
+Current version: **0.2.0a1 · Alpha 1** ([release](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.1)).
+
 Local voice cloning for text and SRT narration, powered by Qwen3-TTS.
 Export a single WAV with subtitle timing. The interface supports English and Korean.
 

@@ -424,13 +424,38 @@
     });
   }, 1000);
 
+  function markSelectedJob() {
+    for (const row of $("job-list").querySelectorAll(".job-row")) {
+      const selected = row.dataset.jobId === selectedJob;
+      row.classList.toggle("is-selected", selected);
+      const button = row.querySelector(".job-header > button");
+      button.textContent = selected ? t("상세 닫기") : t("상세 보기");
+      button.setAttribute("aria-expanded", String(selected));
+      button.setAttribute("aria-controls", "detail");
+    }
+  }
+
   async function refreshJobs() {
     const jobs = await api("/api/jobs");
     const list = $("job-list");
-    list.replaceChildren();
+    const rows = new Map(Array.from(list.querySelectorAll(":scope > .job-row"), row => [row.dataset.jobId, row]));
+    list.querySelector(":scope > .empty")?.remove();
+    const ids = new Set(jobs.map(job => job.id));
+    for (const [id, row] of rows) {
+      if (!ids.has(id)) {
+        if (row.contains($("detail"))) {
+          $("jobs").append($("detail"));
+          $("detail").hidden = true;
+          selectedJob = null;
+        }
+        row.remove();
+      }
+    }
     if (!jobs.length) list.append(el("div", t("작업 없음"), "empty"));
+    let cursor = list.firstElementChild;
     for (const job of jobs) {
-      const row = el("article", undefined, "job-row");
+      const row = rows.get(job.id) || el("article", undefined, "job-row");
+      row.dataset.jobId = job.id;
       row.dataset.status = job.status;
       const header = el("div", undefined, "job-header");
       const info = el("div", undefined, "job-info");
@@ -461,14 +486,25 @@
       );
       const button = el("button", t("상세 보기"));
       button.onclick = () => {
-        selectedJob = job.id;
+        const closing = selectedJob === job.id;
+        $("detail").querySelectorAll("audio").forEach(player => player.pause());
+        selectedJob = closing ? null : job.id;
         detailVersion = null;
-        showDetail().catch((error) => notify(error.message, true));
+        $("detail").hidden = true;
+        markSelectedJob();
+        if (!closing) showDetail().catch((error) => notify(error.message, true));
       };
       header.append(info, badge, button);
-      row.append(header, progressPanel(job));
-      list.append(row);
+      const previousHeader = row.querySelector(":scope > .job-header");
+      if (previousHeader) {
+        previousHeader.querySelector(".job-info").replaceChildren(...info.childNodes);
+        previousHeader.querySelector(".badge").textContent = badge.textContent;
+        row.querySelector(":scope > .job-progress").replaceWith(progressPanel(job));
+      } else row.append(header, progressPanel(job));
+      if (row !== cursor) list.insertBefore(row, cursor);
+      cursor = row.nextElementSibling;
     }
+    markSelectedJob();
     if (selectedJob) await showDetail();
   }
 
@@ -546,7 +582,12 @@
   }
 
   async function showDetail() {
-    const j = await api("/api/jobs/" + selectedJob);
+    const requestedJob = selectedJob;
+    const j = await api("/api/jobs/" + requestedJob);
+    if (selectedJob !== requestedJob) return;
+    const row = Array.from($("job-list").children).find(row => row.dataset.jobId === j.id);
+    if (!row) return;
+    if ($("detail").parentElement !== row) row.append($("detail"));
     progressJobs.set(j.id, j);
     const version = JSON.stringify({
       ...j,
@@ -567,6 +608,7 @@
     )
       return;
     if (
+      $("detail").dataset.jobId === j.id &&
       detailLocale === OwnVoiceI18n.locale &&
       $("detail").contains(document.activeElement) &&
       document.activeElement.tagName === "TEXTAREA"

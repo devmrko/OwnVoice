@@ -2,8 +2,10 @@
 
 [English](README.en.md)
 
+현재 버전: **0.2.0a1 · 알파 1** ([릴리스](https://github.com/devmrko/OwnVoice/releases/tag/v0.2.0-alpha.1))
+
 내 목소리로 텍스트·SRT를 WAV로 만드는 로컬 웹 앱입니다.
-Qwen3-TTS 참조 음성 복제, CUDA/Apple Silicon 자동 선택, 구간 재생성,
+Qwen3-TTS·Chatterbox 모델 선택, CUDA/Apple Silicon 자동 선택, 구간 재생성,
 SRT 시간 맞춤과 실제 처리 기록에 기반한 진행 상황을 제공합니다.
 
 ## 설치
