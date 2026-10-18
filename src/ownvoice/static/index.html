@@ -92,6 +92,14 @@
               </select></label
             >
           </div>
+          <label class="form-field">음성 생성 모델
+            <select id="engine">
+              <option value="qwen">Qwen3-TTS · 1.7B</option>
+              <option value="qwen-small">Qwen3-TTS · 0.6B</option>
+              <option value="chatterbox">Chatterbox Multilingual V3</option>
+            </select>
+            <small id="engine-note" class="muted"></small>
+          </label>
           <div class="switch">
             <button type="button" data-mode="text" class="active">
               텍스트 TTS</button
@@ -138,7 +146,7 @@
             <h1>목소리 관리</h1>
             <p>참조 음성 등록 · 3~60초</p>
           </div>
-          <span class="page-tag">VOICE</span>
+          <a id="voice-comparison" hidden target="_blank" rel="noopener">음성 비교 듣기</a>
         </div>
         <form id="voice-form" class="panel">
           <div class="panel-title layout-between">

@@ -13,6 +13,7 @@ from python_foundation.settings import FoundationSettings
 from ownvoice.audio import convert_reference
 from ownvoice.config import Settings
 from ownvoice.domain import JobRequest, invalid, parse_segments
+from ownvoice.engine_catalog import engine_catalog
 from ownvoice.progress import job_progress
 from ownvoice.repository import Base, Repository
 
@@ -91,6 +92,11 @@ class Service:
         return self.get("profile", key)
 
     def create_job(self, request: JobRequest) -> dict[str, Any]:
+        selected = next(e for e in engine_catalog(self.settings) if e["id"] == request.engine)
+        if not selected["available"]:
+            raise invalid("선택한 엔진을 먼저 설치해 주세요.")
+        if request.engine == "chatterbox" and request.language == "Auto":
+            raise invalid("Chatterbox는 언어를 직접 선택해 주세요.")
         profile = self.get("profile", request.profile_id)
         segments = parse_segments(request.mode, request.content)
         key = str(uuid4())
@@ -100,6 +106,8 @@ class Service:
                 key,
                 {
                     **request.model_dump(),
+                    "engine_name": selected["name"],
+                    "model": selected["model"],
                     "profile_name": profile["name"],
                     "status": "queued",
                     "stage": "queued",

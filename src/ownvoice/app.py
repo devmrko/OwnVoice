@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
@@ -19,7 +20,7 @@ from ownvoice.domain import JobRequest, SegmentEdit, invalid
 from ownvoice.engine import runtime
 from ownvoice.i18n import language, localize_job, translate
 from ownvoice.progress import job_progress
-from ownvoice.service import Service
+from ownvoice.service import Service, missing
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -99,6 +100,35 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/api/profiles")
     def profiles() -> list[dict[str, Any]]:
         return service.list("profile")
+
+    @app.get("/api/comparisons")
+    def comparisons() -> list[str]:
+        root = service.settings.data_dir / "diagnostics"
+        return sorted(
+            (
+                p.name
+                for p in root.glob("voice-comparison-*")
+                if re.fullmatch(r"voice-comparison-\d{8}-\d{6}", p.name)
+                and (p / "index.html").is_file()
+                and ((p / "3-with.wav").is_file() or (p / "chatterbox-3.wav").is_file())
+            ),
+            reverse=True,
+        )
+
+    @app.get("/comparisons/{comparison}/{filename}")
+    def comparison_file(comparison: str, filename: str) -> FileResponse:
+        if not re.fullmatch(r"voice-comparison-\d{8}-\d{6}", comparison):
+            raise missing()
+        if not re.fullmatch(
+            r"index\.html|reference-with\.wav|[1-3]-(?:with|without)\.wav|(?:qwen|qwen-small|chatterbox)-[1-3]\.wav",
+            filename,
+        ):
+            raise missing()
+        root = (service.settings.data_dir / "diagnostics").resolve()
+        path = (root / comparison / filename).resolve()
+        if not path.is_relative_to(root) or not path.is_file():
+            raise missing()
+        return FileResponse(path)
 
     @app.post("/api/profiles", status_code=201)
     def profile(

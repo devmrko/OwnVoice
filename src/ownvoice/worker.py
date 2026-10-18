@@ -179,12 +179,16 @@ def run_worker(service: Service, once: bool = False) -> None:
             while True:
                 job = service.claim()
                 if job:
+                    if hasattr(engine, "select"):
+                        engine.select(job.get("engine", "qwen"))
                     process_job(service, engine, job)
                 elif once:
                     break
                 else:
                     time.sleep(1)
         finally:
+            if hasattr(engine, "close"):
+                engine.close()
             stop.set()
             thread.join()
             heartbeat.unlink(missing_ok=True)

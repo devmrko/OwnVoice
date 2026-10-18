@@ -10,7 +10,9 @@ flowchart LR
   Service --> Foundation[Bundled foundation UnitOfWork]
   Foundation --> DB[(SQLite records)]
   Worker[Single worker + OS lock] --> DB
-  Worker --> Engine[Qwen3-TTS / PyTorch]
+  Worker --> Engine[Selected engine: Qwen 1.7B / 0.6B]
+  Worker -->|JSON lines; sequential| Chatterbox[Isolated Chatterbox V3 subprocess]
+  Chatterbox --> Device
   Engine --> Device[CUDA / MPS / CPU]
   Engine --> Cache[Hugging Face model cache]
   Worker --> Audio[FFmpeg timing fit + WAV assembly]
@@ -19,6 +21,12 @@ flowchart LR
 ```
 
 ## 책임 분리
+
+작업의 `engine`, `engine_name`, `model`은 생성 시 저장됩니다. 기존 작업은 Qwen으로
+처리합니다. Chatterbox는 NumPy/PyTorch/Transformers 버전 충돌을 피하도록 별도
+Python 환경에서 실행됩니다. worker가 자식 프로세스를 소유하며 모델 전환·종료 시
+정리합니다. 모델은 동시에 두 개를 실행하지 않습니다. 단계 이벤트와 WAV를 전달하고
+SRT 시간 맞춤·재시도·최종 조립은 공통 worker에서 수행합니다.
 
 | 모듈 | 책임 |
 |---|---|

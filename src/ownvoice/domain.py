@@ -23,6 +23,7 @@ class Segment(BaseModel):
 
 
 class JobRequest(BaseModel):
+    engine: Literal["qwen", "qwen-small", "chatterbox"] = "qwen"
     profile_id: str
     mode: Literal["text", "srt"]
     content: str = Field(min_length=1, max_length=100_000)

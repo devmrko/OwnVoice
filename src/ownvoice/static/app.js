@@ -85,6 +85,12 @@
     }
   };
   async function profiles() {
+    const comparisons = await api("/api/comparisons");
+    const compareLink = $("voice-comparison");
+    compareLink.hidden = !comparisons.length;
+    compareLink.textContent = t("음성 비교 듣기");
+    if (comparisons.length)
+      compareLink.href = `/comparisons/${encodeURIComponent(comparisons[0])}/index.html`;
     const rows = await api("/api/profiles");
     const current = $("profile").value;
     $("profile").replaceChildren(
@@ -189,6 +195,7 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           profile_id: $("profile").value,
+          engine: $("engine").value,
           mode,
           content: $("content").value,
           language: $("language").value,
@@ -330,7 +337,7 @@
           tr`요청 후 ${duration(p.request_age_seconds === null ? null : p.request_age_seconds + (["running", "queued"].includes(job.status) ? advance : 0))}`,
         ),
       );
-    if (active && p.current_attempt > 1) {
+    if (active && job.mode === "srt" && p.current_attempt > 1) {
       metrics.append(
         el(
           "span",
@@ -431,6 +438,7 @@
         el(
           "strong",
           job.profile_name +
+            " · " + (job.engine_name || "Qwen3-TTS · 1.7B") +
             " · " +
             (job.mode === "srt" ? t("영상 자막") : t("텍스트 TTS")),
         ),
@@ -601,15 +609,35 @@
     for (const segment of j.segments) segments.append(segmentView(j, segment));
     box.append(segments);
   }
+  let engineCatalog = [];
+  function updateEngine() {
+    const selected = engineCatalog.find(e => e.id === $("engine").value);
+    $("engine-name").textContent = selected?.name || "Qwen3-TTS";
+    $("model-name").textContent = selected?.model || "—";
+    $("engine-version").textContent = t("선택한 생성 모델");
+    $("engine-note").textContent = $("engine").value === "qwen-small"
+      ? t("경량 모델 · 속도와 품질은 생성 결과로 비교하세요.")
+      : $("engine").value === "chatterbox"
+        ? t("참조 음성으로 복제 · 대본은 사용하지 않습니다.")
+        : t("참조 음성과 대본으로 복제합니다.");
+    const auto = $("language").querySelector('option[value="Auto"]');
+    auto.disabled = $("engine").value === "chatterbox";
+    if (auto.disabled && $("language").value === "Auto") $("language").value = "Korean";
+  }
+  $("engine").onchange = updateEngine;
   async function refreshRuntime() {
     const r = await api("/api/runtime");
     workerOnline = r.worker_online;
     const hardware = r.hardware || {};
-    $("engine-name").textContent = r.engine?.name || "Qwen3-TTS";
-    $("engine-version").textContent = r.engine?.version
-      ? `qwen-tts ${r.engine.version}`
-      : t("패키지 미설치");
-    $("model-name").textContent = r.model?.replace("Qwen/", "") || t("미설정");
+    engineCatalog = r.engines || [];
+    for (const entry of engineCatalog) {
+      const option = $("engine").querySelector(`option[value="${entry.id}"]`);
+      if (option) {
+        option.disabled = !entry.available;
+        option.textContent = entry.name + (entry.available ? "" : " · " + t("패키지 미설치"));
+      }
+    }
+    updateEngine();
     $("device-name").textContent =
       hardware.name || r.device || t("장치 미확인");
     $("device-memory").textContent = hardware.memory_gb

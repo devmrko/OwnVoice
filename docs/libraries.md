@@ -7,6 +7,14 @@ CUDA 선택 설치 이후 실제 버전은 `uvw pip list`로 확인하세요.
 
 ## 직접 의존성
 
+선택 설치 Chatterbox 환경은 `engines/chatterbox/pyproject.toml`과 별도의 `uv.lock`을
+사용합니다. 루트 잠금 버전 목록에는 포함되지 않습니다. Python 3.12, NumPy 1.26,
+PyTorch/torchaudio 2.6.0, Transformers 5.2.0을 사용하며 Qwen 환경과 공유하지 않습니다.
+Chatterbox 소스는 `5de7a54aa4e5e2baadb0182dde554908b48b85c2`, PerTh는
+`ff1c8ac55a976971245cdd53c18d6131ca00d993` 아카이브로 고정합니다. Git 설치는
+필요하지 않습니다. 나머지 정확한 의존성과 해시는 해당 잠금 파일을 참조하세요.
+외부 패키지·모델은 각자의 라이선스가 적용되며 PerTh 워터마크는 제거하지 않습니다.
+
 | 라이브러리 | 선언 범위 | 역할 |
 |---|---|---|
 | devmrko-python-foundation | 포함된 0.1.0 | 트랜잭션·오류·요청 경계 |

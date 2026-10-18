@@ -42,7 +42,30 @@ keep using that launcher option. CPU test success does not certify CUDA inferenc
 Use your own voice or a voice you have permission to use. This is a single-user
 localhost application, not an authenticated public server.
 
-## Documentation
+## Model selection
+
+Choose Qwen3-TTS 1.7B, lightweight Qwen3-TTS 0.6B, or Chatterbox Multilingual V3
+in generation settings. Qwen 0.6B needs no extra package installation; its weights
+download on first use. Each job retains its engine. Switching unloads the previous
+model. Compare actual speed and quality rather than assuming smaller is faster.
+
+Chatterbox uses a separate optional environment:
+
+```sh
+./uvw sync --locked --project engines/chatterbox --python 3.12 --managed-python
+```
+
+On Windows use `.\uvw.ps1` instead of `./uvw`. For NVIDIA also run:
+
+```powershell
+.\uvw.ps1 pip install --python engines/chatterbox/.venv/Scripts/python.exe torch==2.6.0 torchaudio==2.6.0 --torch-backend=auto --reinstall
+```
+
+Refresh the page after installation. Chatterbox uses reference audio without a
+transcript and requires an explicit language. Upstream PerTh watermarking is retained.
+Windows CUDA inference still needs hardware validation.
+
+## Technical documentation
 
 The detailed technical documents are currently in Korean:
 

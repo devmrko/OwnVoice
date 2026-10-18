@@ -1,5 +1,56 @@
 # Validation — 2026-10-18
 
+## Model selection and real MPS comparison
+
+- Jobs persist an engine selection: Qwen 1.7B, Qwen 0.6B or Chatterbox Multilingual
+  V3. Legacy jobs default to Qwen. Switching releases the previous model and its
+  subprocess before loading the next; SRT fitting and assembly stay shared.
+- Chatterbox runs in its locked Python 3.12 environment. Fixed venv executable
+  symlink resolution, which initially selected base Python without dependencies;
+  both affected jobs were retried and completed. Regression test covers this.
+- 36 tests, Ruff and strict mypy passed. Browser: three model choices, explicit
+  Chatterbox language, ko/en labels, 390px layout and ten comparison audio players
+  passed. Source/wheel build and packaged asset checks passed.
+- Apple M4, same reference and three Korean sentences, one run per model:
+  Qwen 1.7B synthesis 38.21s / audio 11.44s / RTF 3.34;
+  Qwen 0.6B 32.85s / 12.24s / RTF 2.68;
+  Chatterbox V3 24.13s / 12.20s / RTF 1.98.
+  These exclude download/loading. Chatterbox was already loaded by a preceding
+  job; its comparison has no cold-load measurement. Qwen loading was 15.43s and
+  7.98s respectively. No general speed or listening-quality advantage is claimed.
+- Local Whisper large-v3-turbo recognized the requested content in all nine
+  samples; punctuation/spacing and AI spelling differed. Speaker resemblance
+  and naturalness require listening. Windows CUDA has not been exercised here.
+- Optional runtime source archives are pinned, with a separate uv lockfile;
+  installation does not need Git. Generated voices, reports, models and logs
+  stay outside version control. Comparison reports are local-only HTTP assets.
+
+## Reference transcript listening experiment
+
+- Generated three Korean sentences with and without the reference transcript;
+  six private WAVs and an HTML listening page are under `.data/diagnostics/`.
+  Reusable standalone runner: `scripts/compare_voice.py PROFILE_ID`. Stop the
+  application worker first; the runner now holds the worker lock to prevent
+  concurrent model instances. It does not change registered voices or jobs.
+- First two pairs used matching per-sentence seeds, reset immediately before
+  synthesis. Measured synthesis times (without/with transcript): 10.82/11.66
+  seconds and 19.80/18.19 seconds. These are individual observations, not a
+  statistically validated speed or quality improvement.
+- A user job began during the initial experiment. The third no-transcript sample
+  took 140.92 seconds; cause is unconfirmed. The experiment was interrupted and
+  its final sample was generated through the existing service worker (17.88
+  seconds, uncontrolled seed). The third pair is not a controlled benchmark.
+- Local whisper.cpp large-v3-turbo recognized the requested content in all six
+  samples, with punctuation/spacing and AI spelling normalization. This checks
+  intelligibility, not speaker resemblance or subjective naturalness.
+- Chrome loaded all seven audio players (reference plus six outputs); mobile
+  layout at 390px had no horizontal overflow. Listening preference and a
+  selection/registration workflow remain unverified/unimplemented.
+- Restored the stopped local web/worker as an independent service process;
+  its recovered user job completed both segments and produced a 9.24-second WAV.
+  The exit cause was not established. Text TTS no longer shows the SRT-only
+  timing-retry badge after interrupted execution; JavaScript syntax check passed.
+
 - `ruff check`, `ruff format --check`, strict mypy: passed.
 - pytest: 12 passed. Audio engine is a test double; real FFmpeg conversion,
   atempo fitting, WAV sample placement and download are exercised.

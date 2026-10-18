@@ -129,7 +129,33 @@ SRT 시작 시각을 유지하며 짧은 발화 뒤에는 무음을 넣습니다
 - 취소 버튼·프로필 삭제는 아직 지원하지 않습니다.
 - 실제 Apple Silicon 추론은 확인했습니다. 음질은 참조 음성·대본에 따라 달라집니다.
 
-## 개발
+## 음성 생성 모델
+
+생성 설정에서 Qwen3-TTS 1.7B, 경량 Qwen3-TTS 0.6B, Chatterbox Multilingual V3를
+선택합니다. 0.6B는 추가 설치 없이 사용하며 첫 선택 시 모델을 다운로드합니다.
+작업마다 모델을 저장하고, 전환 시 이전 모델을 메모리에서 해제합니다.
+경량 모델의 속도·품질은 실제 생성 결과로 비교하세요.
+
+Chatterbox는 선택 설치입니다. 기존 Qwen 환경과 별도로 설치됩니다.
+
+```sh
+# macOS / Linux
+./uvw sync --locked --project engines/chatterbox --python 3.12 --managed-python
+```
+
+```powershell
+# Windows PowerShell
+.\uvw.ps1 sync --locked --project engines/chatterbox --python 3.12 --managed-python
+# Windows NVIDIA: 별도 환경에도 CUDA PyTorch 설치
+.\uvw.ps1 pip install --python engines/chatterbox/.venv/Scripts/python.exe torch==2.6.0 torchaudio==2.6.0 --torch-backend=auto --reinstall
+```
+
+설치 후 화면을 새로고침하세요. 첫 생성 시 모델이 다운로드됩니다.
+Chatterbox는 참조 음성만 사용하며, 언어를 직접 선택해야 합니다.
+생성 음성에는 upstream의 PerTh 워터마크가 유지됩니다.
+Windows CUDA의 실제 Chatterbox 합성은 NVIDIA 장비에서 별도 검증이 필요합니다.
+
+## 개발 명령
 
 ```sh
 uv sync --locked

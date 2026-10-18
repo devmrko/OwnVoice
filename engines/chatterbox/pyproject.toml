@@ -1,0 +1,12 @@
+[project]
+name = "ownvoice-chatterbox-runtime"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = ["chatterbox-tts", "soundfile>=0.13,<1"]
+
+[tool.uv]
+override-dependencies = ["resemble-perth @ https://github.com/resemble-ai/Perth/archive/ff1c8ac55a976971245cdd53c18d6131ca00d993.zip"]
+
+[tool.uv.sources]
+chatterbox-tts = { url = "https://github.com/resemble-ai/chatterbox/archive/5de7a54aa4e5e2baadb0182dde554908b48b85c2.zip" }
+resemble-perth = { url = "https://github.com/resemble-ai/Perth/archive/ff1c8ac55a976971245cdd53c18d6131ca00d993.zip" }

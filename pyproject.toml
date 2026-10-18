@@ -24,7 +24,7 @@ dev = ["httpx>=0.28,<1", "pytest>=8,<10", "ruff>=0.11,<1", "mypy>=1.15,<2"]
 devmrko-python-foundation = { path = "vendor/python-foundation" }
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/vendor", "/tests", "/scripts", "/docs", "/README.md", "/README.en.md", "/LICENSE", "/pyproject.toml", "/uv.lock", "/uvw", "/uvw.ps1", "/start.sh", "/start.ps1", "/start.cmd"]
+include = ["/src", "/vendor", "/tests", "/scripts", "/docs", "/engines/chatterbox/pyproject.toml", "/engines/chatterbox/uv.lock", "/README.md", "/README.en.md", "/LICENSE", "/pyproject.toml", "/uv.lock", "/uvw", "/uvw.ps1", "/start.sh", "/start.ps1", "/start.cmd"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ownvoice"]
@@ -43,7 +43,7 @@ files = ["src/ownvoice"]
 module = ["python_foundation.*"]
 follow_untyped_imports = true
 [[tool.mypy.overrides]]
-module = ["soundfile", "qwen_tts", "torch", "huggingface_hub"]
+module = ["soundfile", "qwen_tts", "torch", "huggingface_hub", "chatterbox.*"]
 ignore_missing_imports = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
