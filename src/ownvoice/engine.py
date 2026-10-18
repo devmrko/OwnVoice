@@ -19,7 +19,8 @@ def detect_device(requested: str = "auto") -> str:
     import torch
 
     available = ["cpu"]
-    if torch.backends.mps.is_available():
+    mps = getattr(torch.backends, "mps", None)
+    if mps is not None and mps.is_available():
         available.insert(0, "mps")
     if torch.cuda.is_available():
         available.insert(0, "cuda:0")

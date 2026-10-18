@@ -100,3 +100,20 @@
   candidate, continuing later cues, manual retry reset and completed-cue reuse.
 - Retry tests use controlled audio durations; no user's completed audio is modified.
 - Existing lifecycle, audio fitting, API boundaries and progress tests remain passing.
+
+## Documentation, localization and portable launchers
+
+- Added storage/schema/backup, architecture, library/lock inventory, repository audit
+  and platform/bootstrap documents; English quickstart included.
+- Removed only redundant nested foundation CI, lockfile and Python-dependent uvw.
+  Foundation source/examples/tests remain; 33 foundation tests passed locally.
+- 32 OwnVoice tests passed, including ko/en catalog/parameter parity, API locale
+  negotiation, legacy error localization without changing user data, and CUDA
+  detection when no MPS backend exists.
+- Browser: ko/en switching, English title/runtime, persistent locale, retained
+  generation input and 390px layout passed with no JavaScript errors.
+- Downloaded pinned uv and managed Python 3.12.12 into a clean temporary folder
+  using the root bootstrap without invoking a preinstalled Python or uv.
+- Windows CI added for model-free installation, tests and packaging. Actual NVIDIA
+  inference, CUDA wheel selection and interactive Windows console shutdown need
+  hardware validation; these are not claimed from CPU CI.

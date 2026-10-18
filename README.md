@@ -1,13 +1,19 @@
 # OwnVoice
 
+[English](README.en.md)
+
 내 목소리로 텍스트·SRT를 WAV로 만드는 로컬 웹 앱입니다.
 Qwen3-TTS 참조 음성 복제, CUDA/Apple Silicon 자동 선택, 구간 재생성,
 SRT 시간 맞춤과 실제 처리 기록에 기반한 진행 상황을 제공합니다.
 
 ## 설치
 
-macOS Apple Silicon 또는 Linux에서 Python 3.12/3.13, [uv](https://docs.astral.sh/uv/getting-started/installation/), Git, FFmpeg가 필요합니다.
-NVIDIA는 호환되는 드라이버와 CUDA 지원 PyTorch가 필요합니다. Windows는 아직 검증하지 않았습니다.
+Python·uv가 없어도 됩니다. GitHub **Code → Download ZIP**으로 받아 압축을 풀고,
+FFmpeg를 준비한 뒤 Windows는 `start.cmd`, macOS·Linux는 `sh start.sh`를 실행하세요.
+uv와 Python 3.12를 프로젝트 내부에 준비합니다. NVIDIA Windows는 `start.cmd -Cuda`를 사용합니다.
+[플랫폼별 설치·지원 범위](docs/platforms.md)에 상세 절차가 있습니다.
+
+이미 Python과 uv가 설치된 개발 환경에서는 아래 명령도 사용할 수 있습니다.
 
 ```sh
 # macOS (Homebrew)
@@ -52,6 +58,11 @@ HF_HUB_OFFLINE=1 uv run --locked --extra tts ownvoice start
 모델과 패키지는 저장소에 포함하지 않습니다. 여유 디스크와 메모리가 필요하며,
 장치 이름만으로 속도를 보장하지 않습니다. 최초 로딩과 합성 시간은 별도로 표시합니다.
 공식 모델 사용법과 모델 라이선스는 [Qwen 모델 페이지](https://huggingface.co/Qwen/Qwen3-TTS-12Hz-1.7B-Base)를 확인하세요.
+
+## 화면 언어
+
+상단 **화면 언어**에서 한국어·영어를 선택합니다. 선택은 브라우저에 저장됩니다.
+화면 언어와 음성 생성 언어는 별개이며, 대본이나 작업 데이터는 번역하지 않습니다.
 
 ## 사용
 
@@ -134,7 +145,12 @@ uv run --locked python scripts/verify_wheel.py
 ```
 
 테스트는 임시 데이터와 테스트용 합성기를 사용합니다. 실행 중인 사용자 작업을 변경하지 않습니다.
-[설계](docs/design/ownvoice.md) · [검증 기록](docs/validation.md) · [포함한 소스](vendor/README.md)
+- [데이터 저장 파일·백업·복구](docs/storage.md)
+- [아키텍처와 처리 흐름](docs/architecture.md)
+- [라이브러리 명세](docs/libraries.md) · [전체 잠금 버전](docs/dependencies-lock.md)
+- [Windows CUDA·첫 실행](docs/platforms.md)
+- [설계](docs/design/ownvoice.md) · [검증 기록](docs/validation.md)
+- [저장소 정리 내역](docs/repository-audit.md) · [포함한 소스](vendor/README.md)
 
 ## 라이선스
 

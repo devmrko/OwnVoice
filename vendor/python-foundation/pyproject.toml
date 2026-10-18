@@ -33,7 +33,7 @@ dev = ["pytest>=8.3,<10", "ruff>=0.11,<1", "mypy>=1.15,<2"]
 packages = ["src/python_foundation"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/example_app", "/tests", "/scripts", "/docs", "/alembic", "/alembic.ini", "/README.md", "/pyproject.toml", "/uv.lock", "/uvw", "/AGENTS.md", "/CHANGELOG.md"]
+include = ["/src", "/example_app", "/tests", "/scripts", "/docs", "/alembic", "/alembic.ini", "/README.md", "/pyproject.toml", "/AGENTS.md", "/CHANGELOG.md"]
 
 [tool.ruff]
 line-length = 110

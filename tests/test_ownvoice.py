@@ -209,3 +209,14 @@ def test_device_order(monkeypatch):
     assert detect_device() == "cpu"
     with pytest.raises(ValueError):
         detect_device("cuda")
+
+
+def test_cuda_detection_without_mps_backend(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    from ownvoice.engine import detect_device
+
+    torch = SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: True), backends=SimpleNamespace())
+    monkeypatch.setitem(sys.modules, "torch", torch)
+    assert detect_device() == "cuda:0"

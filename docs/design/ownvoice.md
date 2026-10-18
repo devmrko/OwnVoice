@@ -136,3 +136,16 @@ time and attempt count; other cues continue and final export remains blocked.
 Timing samples include each inference attempt, including discarded candidates.
 This increases the chance of fitting; it does not guarantee fit or validate
 that the model pronounced every word. Preview remains necessary for quality.
+
+## Presentation language and bootstrap
+
+UI locale (ko/en) is independent from synthesis language. JSON catalogs are
+packaged with the static assets; API Accept-Language controls display errors,
+including legacy known error templates. Never translate user content or rewrite
+DB rows for a language switch. LocalStorage stores only the locale. Text drafts
+remain in memory through language switching and polling.
+Root uvw/uvw.ps1 bootstrap a pinned uv and managed Python in .tools without
+requiring Python or uv beforehand. start launchers prepare .venv, check FFmpeg,
+and invoke the process manager. CUDA wheel selection on Windows is opt-in via
+-Cuda and can change torch versions outside the base lock; subsequent run uses
+no-sync. Windows process groups receive CTRL_BREAK before kill timeout.

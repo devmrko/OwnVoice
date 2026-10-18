@@ -949,3 +949,36 @@ nav .active .nav-icon {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-right: var(--space-4);
+}
+.locale-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-size: 11px;
+  color: #fff;
+}
+.locale-control select {
+  width: auto;
+  min-height: 30px;
+  height: 30px;
+  padding: 4px 8px;
+  color: #fff;
+  background: #393632;
+  border: 1px solid #77716a;
+}
+@media (max-width: 720px) {
+  .header-tools {
+    gap: 0;
+    padding-right: var(--space-3);
+  }
+  .locale-control > span {
+    display: none;
+  }
+}

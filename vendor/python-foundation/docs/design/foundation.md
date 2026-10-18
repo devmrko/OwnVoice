@@ -35,3 +35,10 @@ uv build로 wheel/sdist 생성. 별도 가상환경에 wheel만 설치해 예제
 ## 개발 방법론과 검증
 
 설계 → 구현 → Ruff/타입 검사 → 계약·통합 테스트 → 실제 프로세스·wheel 소비 → 문서/변경 이력 → Git 커밋·비공개 GitHub 반영. 테스트는 commit/rollback/commit 실패 정리/권한 거부/CSRF/세션 회전·폐기/잘못된 JWT/버전 충돌/500 비노출/HTML escaping/마이그레이션을 포함한다. Python final은 정적 검사 약속이며 Java처럼 런타임 재정의를 막는 장치가 아님을 문서화한다.
+
+## OwnVoice bundle packaging
+
+The OwnVoice distribution uses its root uv.lock, launchers and CI workflow.
+The nested upstream lockfile, Python-dependent uvw bootstrap and nested CI are
+omitted to avoid competing installation paths. Library, example, templates,
+tests and original design documentation remain available.

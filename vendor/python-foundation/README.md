@@ -1,5 +1,8 @@
 # Python Foundation
 
+> OwnVoice에 포함된 참조 소스입니다. 설치는 저장소 루트의 README와 실행기를 사용하세요.
+> 독립 실행용 uvw·uv.lock·CI는 루트에서 통합 관리합니다.
+
 FastAPI 기반의 재사용 라이브러리와 실행 가능한 Project 예제입니다.
 Spring Foundation과 개발 방법론·CRUD HTTP 계약을 공유하되 Python 방식으로 구현합니다.
 

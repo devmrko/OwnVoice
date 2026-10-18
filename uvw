@@ -1,0 +1,20 @@
+#!/bin/sh
+# Bootstrap uv and Python locally. Requires only sh, curl and an internet connection.
+set -eu
+ownvoice_root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+export UV_PYTHON_INSTALL_DIR="$ownvoice_root/.tools/python"
+export UV_PYTHON_DOWNLOADS=automatic
+export UV_PYTHON_BIN_DIR="$ownvoice_root/.tools/bin"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-$ownvoice_root/.tools/cache}"
+ownvoice_uv="$ownvoice_root/.tools/uv/uv"
+if [ ! -x "$ownvoice_uv" ]; then
+    command -v curl >/dev/null 2>&1 || { echo 'Install curl and run this command again.' >&2; exit 1; }
+    mkdir -p "$ownvoice_root/.tools/uv"
+    ownvoice_installer=$(mktemp)
+    trap 'rm -f "$ownvoice_installer"' EXIT HUP INT TERM
+    curl --proto '=https' --tlsv1.2 -LsSf https://astral.sh/uv/0.10.6/install.sh -o "$ownvoice_installer"
+    UV_UNMANAGED_INSTALL="$ownvoice_root/.tools/uv" UV_NO_MODIFY_PATH=1 sh "$ownvoice_installer"
+    rm -f "$ownvoice_installer"
+    trap - EXIT HUP INT TERM
+fi
+exec "$ownvoice_uv" "$@"

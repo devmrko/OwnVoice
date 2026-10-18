@@ -42,13 +42,14 @@ def test_model_download_includes_tokenizer_and_offline(monkeypatch, tmp_path):
 def test_second_worker_refuses_lock_and_leaves_jobs_untouched(service):  # noqa: F811
     job = service.create_job(JobRequest(profile_id="test", mode="text", content="Hello"))
     service.claim()
-    env = {**os.environ, "OWNVOICE_DATA_DIR": str(service.settings.data_dir)}
+    env = {**os.environ, "PYTHONUTF8": "1", "OWNVOICE_DATA_DIR": str(service.settings.data_dir)}
     with FileLock(str(service.settings.data_dir / "worker.lock")):
         result = subprocess.run(
             [sys.executable, "-m", "ownvoice.cli", "worker", "--once"],
             env=env,
             capture_output=True,
             text=True,
+            encoding="utf-8",
             timeout=20,
         )
     assert result.returncode != 0

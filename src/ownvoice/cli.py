@@ -50,13 +50,23 @@ def interrupted(signum: int, frame: Any) -> None:
 
 def start(port: int) -> int:
     # Refuse an occupied port before starting a worker or touching job state.
+    socket_option = socket.SO_REUSEADDR
+    creation_flags = 0
+    if sys.platform == "win32":
+        socket_option = socket.SO_EXCLUSIVEADDRUSE
+        creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP
     with socket.socket() as probe:
-        probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        probe.setsockopt(socket.SOL_SOCKET, socket_option, 1)
         probe.bind(("127.0.0.1", port))
     processes: list[subprocess.Popen[bytes]] = []
     try:
         for command in (["web", "--port", str(port)], ["worker"]):
-            processes.append(subprocess.Popen([sys.executable, "-m", "ownvoice.cli", *command]))
+            processes.append(
+                subprocess.Popen(
+                    [sys.executable, "-m", "ownvoice.cli", *command],
+                    creationflags=creation_flags,
+                )
+            )
         print(f"OwnVoice: http://127.0.0.1:{port} · 종료: Ctrl+C", flush=True)
         while all(p.poll() is None for p in processes):
             time.sleep(0.5)
@@ -66,7 +76,10 @@ def start(port: int) -> int:
     finally:
         for p in processes:
             if p.poll() is None:
-                p.terminate()
+                if sys.platform == "win32":
+                    p.send_signal(signal.CTRL_BREAK_EVENT)
+                else:
+                    p.terminate()
         for p in processes:
             try:
                 p.wait(timeout=15)
@@ -84,6 +97,8 @@ def main() -> None:
     args = parser.parse_args()
     settings = Settings()
     signal.signal(signal.SIGTERM, interrupted)
+    if sys.platform == "win32":
+        signal.signal(signal.SIGBREAK, interrupted)
     try:
         if args.command == "doctor":
             raise SystemExit(0 if doctor(settings) else 1)
